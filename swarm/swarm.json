@@ -83,8 +83,9 @@
     },
     "agentVMSize": {
       "type": "string",
-      "defaultValue": "Standard_A1",
+      "defaultValue": "Standard_A0",
       "allowedValues": [
+        "Standard_A0",
         "Standard_A1",
         "Standard_A2",
         "Standard_A3",
