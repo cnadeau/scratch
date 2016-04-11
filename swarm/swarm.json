@@ -23,26 +23,6 @@
         "description": "SSH public key used for auth to all Linux machines.  Not Required.  If not set, you must provide a password key."
       }
     },
-    "windowsAdminUsername": {
-      "type": "string",
-      "defaultValue": "azureuser",
-      "metadata": {
-        "description": "User name for the Windows Jumpbox Virtual Machine (Password Only Supported)."
-      }
-    },
-    "windowsAdminPassword": {
-      "type": "securestring",
-      "defaultValue": "",
-      "metadata": {
-        "description": "Password for the Windows Jumpbox Virtual Machine."
-      }
-    },
-    "jumpboxEndpointDNSNamePrefix": {
-      "type": "string",
-      "metadata": {
-        "description": "Sets the Domain name label for the jumpbox.  The concatenation of the domain name label and the regionalized DNS zone make up the fully qualified domain name associated with the public IP address."
-      }
-    },
     "masterEndpointDNSNamePrefix": {
       "type": "string",
       "metadata": {
@@ -116,27 +96,6 @@
         "description": "This is the linux sku used by the linux cluster"
       }
     },
-    "windowsJumpboxPublisher": {
-      "type": "string",
-      "defaultValue": "MicrosoftVisualStudio",
-      "metadata": {
-        "description": "This is the windows publisher used by the windows jumpbox"
-      }
-    },
-    "windowsJumpboxOffer": {
-      "type": "string",
-      "defaultValue": "VisualStudio",
-      "metadata": {
-        "description": "This is the windows offer used by the windows jumpbox"
-      }
-    },
-    "windowsJumpboxSku": {
-      "type": "string",
-      "defaultValue": "VS-2015-Enterprise-AzureSDK-2.7-WS2012R2",
-      "metadata": {
-        "description": "This is the windows sku used by the windows jumpbox"
-      }
-    },
     "isValidation": {
       "type": "int",
       "defaultValue": 0,
@@ -171,7 +130,6 @@
   "variables": {
     "adminUsername": "[parameters('linuxAdminUsername')]",
     "adminPassword": "[parameters('linuxAdminPassword')]",
-    "jumpboxEndpointDNSNamePrefix": "[tolower(parameters('jumpboxEndpointDNSNamePrefix'))]",
     "masterEndpointDNSNamePrefix": "[tolower(parameters('masterEndpointDNSNamePrefix'))]",
     "agentEndpointDNSNamePrefix": "[tolower(parameters('agentEndpointDNSNamePrefix'))]",
     "agentCount": "[parameters('agentCount')]",
@@ -181,11 +139,6 @@
     "linuxPublisher": "[parameters('linuxPublisher')]",
     "linuxOffer": "[parameters('linuxOffer')]",
     "linuxSku": "[parameters('linuxSku')]",
-    "windowsJumpboxPublisher": "[parameters('windowsJumpboxPublisher')]",
-    "windowsJumpboxOffer": "[parameters('windowsJumpboxOffer')]",
-    "windowsJumpboxSku": "[parameters('windowsJumpboxSku')]",
-    "windowsAdminUsername": "[parameters('windowsAdminUsername')]",
-    "windowsAdminPassword": "[parameters('windowsAdminPassword')]",
 
     "nameSuffix": "[parameters('nameSuffix')]",
 
@@ -219,8 +172,7 @@
 
     "masterPublicIPAddressName": "[concat(variables('orchestratorName'), '-master-ip-', variables('masterEndpointDNSNamePrefix'), '-', variables('nameSuffix'))]",
     "agentPublicIPAddressName": "[concat(variables('orchestratorName'), '-agent-ip-', variables('agentEndpointDNSNamePrefix'), '-', variables('nameSuffix'))]",
-    "jumpboxPublicIPAddressName": "[concat(variables('orchestratorName'), '-jumpbox-ip-', variables('jumpboxEndpointDNSNamePrefix'), '-', variables('nameSuffix'))]",
-
+    
     "osImagePublisher": "[variables('linuxPublisher')]",
     "osImageOffer": "[variables('linuxOffer')]",
     "osImageSKU": "[variables('linuxSku')]",
@@ -249,18 +201,8 @@
     "sshQuotedString": "[concat(' ', variables('singleQuote'), 'disabled', variables('singleQuote'), ' ')]",
     "clusterInstallParameters": "[concat(variables('masterCount'), ' ',variables('masterVMNamePrefix'), ' ',variables('masterFirstAddr'), ' ',variables('adminUsername'))]",
 
-    "jumpboxNSGName": "[concat(variables('orchestratorName'), '-jumpbox-nsg-', variables('nameSuffix'))]",
-    "jumpboxNSGID": "[resourceId('Microsoft.Network/networkSecurityGroups',variables('jumpboxNSGName'))]",
-    "jumpboxAddr": 4,
-    "jumpboxVMName": "[concat(variables('orchestratorName'), '-jumpbox-', variables('nameSuffix'))]",
-    "jumpboxVMSize": "Standard_A1",
-
-    "jumpboxLinuxInstallParameters": "[concat(variables('adminUsername'), variables('sshQuotedString'))]",
-    "jumpboxLinuxCustomScript": "[concat('/usr/bin/nohup /bin/bash -c \"/bin/bash /opt/azure/containers/configure-ubuntu.sh ',variables('jumpboxLinuxInstallParameters'),' >> /var/log/azure/jumpbox-bootstrap.log 2>&1 &\" &')]",
-
     "setBrowserFirstTabDefaultPrefix": "powershell.exe -ExecutionPolicy Unrestricted -command \"New-Item -Path HKLM:'\\SOFTWARE\\Policies\\Microsoft\\Internet Explorer' ; New-Item -Path HKLM:'\\SOFTWARE\\Policies\\Microsoft\\Internet Explorer\\BrowserEmulation' ; New-ItemProperty -Path HKLM:'\\SOFTWARE\\Policies\\Microsoft\\Internet Explorer\\BrowserEmulation' -Name IntranetCompatibilityMode -Value 0 -Type DWord; New-Item -Path HKLM:'\\SOFTWARE\\Policies\\Microsoft\\Internet Explorer\\Main' ; New-ItemProperty -Path HKLM:'\\SOFTWARE\\Policies\\Microsoft\\Internet Explorer\\Main' -Name 'Start Page' -Type String -Value http://\"",
     "setBrowserFirstTabDefaultSuffix": "0:5050",
-    "jumpboxWindowsCustomScript": "[concat(variables('setBrowserFirstTabDefaultPrefix'),variables('masterVMNamePrefix'),variables('setBrowserFirstTabDefaultSuffix'))]",
 
     "masterNSGName": "[concat(variables('orchestratorName'), '-master-nsg-', variables('nameSuffix'))]",
     "masterNSGID": "[resourceId('Microsoft.Network/networkSecurityGroups',variables('masterNSGName'))]",
@@ -846,10 +788,6 @@
     }
   ],
   "outputs": {
-    "jumpboxFQDN": {
-      "type": "string",
-      "value": ""
-    },
     "masterFQDN": {
       "type": "string",
       "value": "[reference(concat('Microsoft.Network/publicIPAddresses/', variables('masterPublicIPAddressName'))).dnsSettings.fqdn]"

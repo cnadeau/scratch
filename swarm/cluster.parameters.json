@@ -1,7 +1,4 @@
 {
-  "jumpboxEndpointDNSNamePrefix": {
-    "value": "swarmjb1122g"
-  },
   "masterEndpointDNSNamePrefix": {
     "value": "swarmmgmt1122g"
   },
